@@ -1,21 +1,21 @@
+// src/components/Profile.jsx
 
 import React from 'react';
 import { Container, Typography, TextField, Button } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { user } = useSelector(state => state.auth); // Get user data from Redux store
+    
+    // Retrieve user data from local storage
+    const user = JSON.parse(localStorage.getItem('loggedInUser'));
 
-    const handleEdit = () => {
-        // Implement edit functionality if needed
-        alert('Edit functionality not implemented yet!');
-    };
+    if (!user) {
+        return <Typography variant="h6">No user data found. Please log in.</Typography>; // Show a message if user is not found
+    }
 
     const handleLogout = () => {
-        localStorage.removeItem('loggedInUser'); // Clear localStorage on logout
+        localStorage.removeItem('loggedInUser'); // Clear user data from local storage
         navigate('/'); // Redirect to the sign-in page
     };
 
@@ -27,7 +27,7 @@ const Profile = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={user?.firstName || ''}
+                value={user.firstName}
                 disabled
             />
             <TextField
@@ -35,7 +35,7 @@ const Profile = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={user?.lastName || ''}
+                value={user.lastName}
                 disabled
             />
             <TextField
@@ -43,7 +43,7 @@ const Profile = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={user?.email || ''}
+                value={user.email}
                 disabled
             />
             <TextField
@@ -51,13 +51,10 @@ const Profile = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={user?.phone || ''}
+                value={user.phone}
                 disabled
             />
-            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleEdit}>
-                Edit Details
-            </Button>
-            <Button variant="outlined" color="secondary" sx={{ mt: 2, ml: 2 }} onClick={handleLogout}>
+            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleLogout}>
                 Logout
             </Button>
         </Container>

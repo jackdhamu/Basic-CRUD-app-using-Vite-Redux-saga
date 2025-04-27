@@ -1,11 +1,10 @@
-// src/redux/sagas/authSagas.js
 
 import { call, put, takeEvery } from 'redux-saga/effects';
 import {
     SIGN_IN_REQUEST,
+    SIGN_UP_REQUEST,
     signInSuccess,
     signInFailure,
-    SIGN_UP_REQUEST,
     signUpSuccess,
     signUpFailure
 } from '../actions/authActions';
@@ -16,12 +15,17 @@ const getUserDataFromLocalStorage = () => {
     return users ? JSON.parse(users) : [];
 };
 
-// Example API call for sign-in validation
+// Function to save user data to local storage
+const saveUserDataToLocalStorage = (userData) => {
+    const users = getUserDataFromLocalStorage();
+    users.push(userData);
+    localStorage.setItem('users', JSON.stringify(users)); // Save back to local storage
+};
+
+// Simulated API call for sign-in validation
 const validateUser = (email, password) => {
     return new Promise((resolve, reject) => {
         const users = getUserDataFromLocalStorage();
-        // Find user based on email and password
-        console.log('jack users', users, email, password)
         const user = users.find(u => u.email === email && u.password === password);
         if (user) {
             resolve(user);
@@ -34,24 +38,23 @@ const validateUser = (email, password) => {
 function* signInSaga(action) {
     try {
         const user = yield call(validateUser, action.payload.email, action.payload.password);
-        localStorage.setItem('loggedInUser', JSON.stringify(user)); // Store logged-in user
-        yield put(signInSuccess(user)); // Dispatch success action
+        localStorage.setItem('loggedInUser', JSON.stringify(user)); 
+        yield put(signInSuccess(user));
     } catch (error) {
-        yield put(signInFailure(error.message)); // Dispatch failure action
+        yield put(signInFailure(error.message)); 
     }
 }
 
 function* signUpSaga(action) {
     try {
         // Save the user data to local storage
-        saveUserDataToLocalStorage(action.payload);
-        yield put(signUpSuccess(action.payload)); // Dispatch sign-up success
+        saveUserDataToLocalStorage(action.payload); // Call the function here
+        yield put(signUpSuccess(action.payload));
     } catch (error) {
-        yield put(signUpFailure(error.message)); // Dispatch sign-up failure
+        yield put(signUpFailure(error.message)); 
     }
 }
 
-// Watcher saga for authentication actions
 export function* watchAuthSagas() {
     yield takeEvery(SIGN_IN_REQUEST, signInSaga);
     yield takeEvery(SIGN_UP_REQUEST, signUpSaga);
